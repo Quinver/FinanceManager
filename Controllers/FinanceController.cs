@@ -6,7 +6,7 @@ namespace FinanceManager.Controllers;
 
 public class FinanceController : Controller
 {
-    private static List<Expense> expenses = new List<Expense>(); 
+    private static readonly List<Expense> expenses = new();
 
     private readonly ILogger<FinanceController> _logger;
 
@@ -36,16 +36,79 @@ public class FinanceController : Controller
     {
         return View();
     }
-    
+
     [HttpPost]
     public IActionResult AddExpense(Expense expense)
     {
-        if(ModelState.IsValid)
+        if (ModelState.IsValid)
         {
             expense.Id = expenses.Count + 1;
             expenses.Add(expense);
             return RedirectToAction("Index");
         }
         return View(expense);
+    }
+
+    [HttpPost]
+    public IActionResult RemoveExpense(int Id)
+    {
+        var expense = expenses.FirstOrDefault(e => e.Id == Id);
+        if (expense != null)
+        {
+            expenses.Remove(expense);
+        }
+        return RedirectToAction("Index");
+    }
+    [HttpGet]
+    public IActionResult EditExpense(int id)
+    {
+        var expense = expenses.FirstOrDefault(e => e.Id == id);
+        if (expense == null)
+            return NotFound();
+
+        return View(expense);
+    }
+
+    [HttpPost]
+    public IActionResult EditExpense(Expense expense)
+    {
+        if (ModelState.IsValid)
+        {
+            var existingExpense = expenses.FirstOrDefault(e => e.Id == expense.Id);
+            if (existingExpense != null)
+            {
+                existingExpense.Name = expense.Name;
+                existingExpense.Amount = expense.Amount;
+                existingExpense.Description = expense.Description;
+            }
+            return RedirectToAction("Index");
+        }
+        return View(expense);
+    }
+
+    [HttpPost]
+    public IActionResult ResetExpenses()
+    {
+        if (expenses.Count != 0)
+        {
+            expenses.Clear();
+
+        }
+        return RedirectToAction("Index");
+    }
+
+    public IActionResult ExpenseChartDate()
+    {
+        // Group expenses by date and sum them up
+        var expenseData = expenses
+            .GroupBy(e => e.DateTime.Date) // Group by date only (ignore time)
+            .Select(g => new
+            {
+                Date = g.Key.ToString("yyyy-MM-dd"), // Format the date
+                TotalAmount = g.Sum(e => e.Amount) // Sum the amounts
+            })
+            .ToList();
+
+        return Json(expenseData); // Return data as JSON
     }
 }

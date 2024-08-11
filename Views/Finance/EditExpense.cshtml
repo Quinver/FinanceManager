@@ -1,10 +1,10 @@
 @model FinanceManager.Models.Expense
 @{
-    ViewData["Title"] = "Add Expense";
+    ViewData["Title"] = "Edit Expense";
 }
 
 <h1>@ViewData["Title"]</h1>
-<form asp-action="AddExpense" class="row gx-5 gy-3">
+<form asp-action="EditExpense" class="row gx-5 gy-3">
     <div class="col-sm-3">
         <label asp-for="Name" class="form-label"></label>
         <input asp-for="Name" class="form-control" required/>
@@ -14,12 +14,8 @@
         <label asp-for="Amount" class="col-sm-1 form-label"></label>
         <div class="input-group">
             <div class="input-group-text">€</div>
-            <input asp-for="Amount" type="number" step="0.01" class="form-control w-25" placeholder="Amount" required />
+            <input asp-for="Amount" type="number" step="0.01" class="form-control w-25" placeholder="Price" required />
         </div>
-    </div>
-    <div class="col-sm-2">
-            <label asp-for="DateTime" class="form-label"></label>
-            <input asp-for="DateTime" type="date" class="form-control w-auto" required />
     </div>
     <div class="form-group">
         <label asp-for="Description" class="form-label"></label>
@@ -28,7 +24,7 @@
     </div>
 
     <div class="col-auto">
-        <input type="Submit" value="Add Expense" class="btn btn-primary" />
+        <input type="Submit" value="Edit Expense" class="btn btn-primary" />
     </div>
 </form>
 
