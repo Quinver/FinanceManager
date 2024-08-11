@@ -1,0 +1,26 @@
+﻿@model IEnumerable<FinanceManager.Models.Expense>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        <a asp-action="AddExpense" class="btn btn-primary">Add Expense</a>
+        @foreach(var expense in Model)
+        {
+            <tr>
+                <td>@expense.Name</td>
+                <td>@expense.Description</td>
+                <td>€@expense.Price</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
