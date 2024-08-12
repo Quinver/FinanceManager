@@ -2,7 +2,21 @@
 @{
     ViewData["Title"] = "Home Page";
     double TotalExpense = Model.Sum(expense => expense.Amount);
+    var ShowCount = 5; // Number of items to show initially
 }
+
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+<p>Expenses Count: @Model.Count()</p>
+<p>First Expense Date: @Model.FirstOrDefault()?.DateTime.ToShortDateString()</p>
+
+<div>
+    <a asp-action="AddExpense" class="btn btn-primary">Add</a>
+</div>
 
 <table class="table">
     <thead>
@@ -15,18 +29,20 @@
         </tr>
     </thead>
     <tbody>
-        <a asp-action="AddExpense" class="btn btn-primary">Add</a>
-        @foreach(var expense in Model)
+        @for (int i = 0; i < Model.Count(); i++)
         {
-            <tr>
-                <td>@expense.DateTime.ToShortDateString()</td>
-                <td>@expense.Name</td>
-                <td>@expense.Description</td>
-                <td>€@expense.Amount</td>
+            <tr class="expense-item @(i >= ShowCount ? "hidden" : "")">
+                <td>@Model.ElementAt(i).DateTime.ToShortDateString()</td>
+                <td>@Model.ElementAt(i).Name</td>
+                <td>@Model.ElementAt(i).Description</td>
+                <td>€@Model.ElementAt(i).Amount</td>
                 <td>
-                    <a asp-action="EditExpense" asp-route-id="@expense.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <form asp-action="RemoveExpense" asp-route-Id="@expense.Id" style="display: inline;">
-                       <input type="submit" value="Delete" class="btn btn-danger btn-sm">
+                    <a asp-action="EditExpense" asp-route-id="@Model.ElementAt(i).Id" class="btn btn-warning btn-sm">Edit</a>
+                    <form asp-action="DuplicateExpense" asp-route-Id="@Model.ElementAt(i).Id" style="display: inline;">
+                        <input type="submit" value="Duplicate" class="btn btn-primary btn-sm">
+                    </form>
+                    <form asp-action="RemoveExpense" asp-route-Id="@Model.ElementAt(i).Id" style="display: inline;">
+                        <input type="submit" value="Delete" class="btn btn-danger btn-sm">
                     </form>
                 </td>
             </tr>
@@ -37,7 +53,7 @@
                 <td></td>
                 <td><strong>Total</strong></td>
                 <td><strong>The total amount of expenses</strong></td>
-                <td><strong>€@TotalExpense</strong></td>
+                <td><strong>€@Math.Round(TotalExpense, 2)</strong></td>
                 <td>
                     <form asp-action="ResetExpenses" style="display: inline;">
                         <input type="submit" value="Reset All" class="btn btn-danger btn-sm" />
@@ -48,12 +64,40 @@
     </tbody>
 </table>
 
+@if(Model.Count() > ShowCount)
+{
+    <button id="expandBtn" class="btn btn-info">Show More</button>
+}
+
 <div>
     <canvas id="expensesChart" width="400" height="200"></canvas>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var expandButton = document.getElementById('expandBtn');
+        var itemsPerClick = 5; // Number of additional items to show per click
+        var hiddenItems = Array.from(document.querySelectorAll('.expense-item.hidden'));
+
+        if (expandButton) {
+            expandButton.addEventListener('click', function () {
+                // Find the next set of hidden items to show
+                var itemsToShow = hiddenItems.splice(0, itemsPerClick);
+
+                itemsToShow.forEach(function (item) {
+                    item.classList.remove('hidden');
+                });
+
+                // Hide the button if there are no more hidden items
+                if (hiddenItems.length === 0) {
+                    expandButton.style.display = 'none';
+                }
+            });
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
         fetch('@Url.Action("ExpenseChartDate")')
             .then(response => {
@@ -108,4 +152,3 @@
             .catch(error => console.error('Error fetching chart data:', error));
     });
 </script>
-

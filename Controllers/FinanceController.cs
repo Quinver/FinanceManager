@@ -6,7 +6,7 @@ namespace FinanceManager.Controllers;
 
 public class FinanceController : Controller
 {
-    private static readonly List<Expense> expenses = new();
+    private static List<Expense> expenses = new();
 
     private readonly ILogger<FinanceController> _logger;
 
@@ -17,6 +17,7 @@ public class FinanceController : Controller
 
     public IActionResult Index()
     {
+        expenses = expenses.OrderBy(e => e.DateTime).Reverse().ToList();
         return View(expenses);
     }
 
@@ -80,6 +81,7 @@ public class FinanceController : Controller
                 existingExpense.Name = expense.Name;
                 existingExpense.Amount = expense.Amount;
                 existingExpense.Description = expense.Description;
+                existingExpense.DateTime = expense.DateTime;
             }
             return RedirectToAction("Index");
         }
@@ -92,8 +94,29 @@ public class FinanceController : Controller
         if (expenses.Count != 0)
         {
             expenses.Clear();
-
         }
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public IActionResult DuplicateExpense(int Id)
+    {
+        var expense = expenses.FirstOrDefault(e => e.Id == Id);
+        if (expense != null)
+        {
+            var newExpense = new Expense
+            {
+                Id = expenses.Count + 1,
+                Name = expense.Name,
+                Amount = expense.Amount,
+                Description = expense.Description,
+                DateTime = expense.DateTime
+            };
+
+            expenses.Add(newExpense);
+            return RedirectToAction("Index");
+        }
+
         return RedirectToAction("Index");
     }
 
@@ -101,7 +124,8 @@ public class FinanceController : Controller
     {
         // Group expenses by date and sum them up
         var expenseData = expenses
-            .GroupBy(e => e.DateTime.Date) // Group by date only (ignore time)
+            .GroupBy(e => e.DateTime.Date)
+            .OrderByDescending(g => g.Key) // Group by date only (ignore time)
             .Select(g => new
             {
                 Date = g.Key.ToString("yyyy-MM-dd"), // Format the date
