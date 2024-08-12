@@ -19363,6 +19363,11 @@
       "FilePath": "/home/quinver/git/FinanceManager/Views/_ViewStart.cshtml",
       "TargetPath": "Views\\_ViewStart.cshtml",
       "FileKind": "mvc"
+    },
+    {
+      "FilePath": "/home/quinver/git/FinanceManager/Views/Finance/EditExpense.cshtml",
+      "TargetPath": "Views\\Finance\\EditExpense.cshtml",
+      "FileKind": "mvc"
     }
   ],
   "SerializationFormat": "0.3"
