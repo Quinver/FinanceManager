@@ -25,3 +25,5 @@ Follow the instructions below to set up and run the application on your local ma
 2. **Run in terminal**:
    ```bash
    dotnet run
+3. **Open in browser**
+   [http://localhost:5227/](url)
