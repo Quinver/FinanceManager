@@ -25,6 +25,8 @@ Follow the instructions below to set up and run the application on your local ma
 2. **Run in terminal**:
    ```bash
    dotnet run
-3. **Open in browser**
+3. **Open in browser with port 5227**
+   
+   [http://localhost:5227/](http://localhost:5227/)
 
-   [localhost](http://localhost:5227/)
+   (Change ports in FinanceManager/Properties/launchSettings.json)
