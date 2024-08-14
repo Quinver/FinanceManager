@@ -14,7 +14,7 @@ public class FinanceController : Controller
     {
         _logger = logger;
     }
-
+    
     public IActionResult Index()
     {
         expenses = expenses.OrderBy(e => e.DateTime).Reverse().ToList();
@@ -125,12 +125,12 @@ public class FinanceController : Controller
         // Group expenses by date and sum them up
         var expenseData = expenses
             .GroupBy(e => e.DateTime.Date)
-            .OrderByDescending(g => g.Key) // Group by date only (ignore time)
             .Select(g => new
             {
                 Date = g.Key.ToString("yyyy-MM-dd"), // Format the date
                 TotalAmount = g.Sum(e => e.Amount) // Sum the amounts
             })
+            .OrderBy(d => d.Date)
             .ToList();
 
         return Json(expenseData); // Return data as JSON
