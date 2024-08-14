@@ -21,7 +21,7 @@ Follow the instructions below to set up and run the application on your local ma
 
    ```bash
    git clone https://github.com/Quinver/FinanceManager.git
-   cd your-repo-name
+   cd FinanceManager
 2. **Run in terminal**:
    ```bash
    dotnet run
