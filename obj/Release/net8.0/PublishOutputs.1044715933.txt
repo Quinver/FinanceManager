@@ -1,0 +1,7 @@
+D:\Coding\webapp\FinanceManager\bin\Release\net8.0\publish\FinanceManager.exe
+D:\Coding\webapp\FinanceManager\bin\Release\net8.0\publish\appsettings.Development.json
+D:\Coding\webapp\FinanceManager\bin\Release\net8.0\publish\appsettings.json
+D:\Coding\webapp\FinanceManager\bin\Release\net8.0\publish\FinanceManager.dll
+D:\Coding\webapp\FinanceManager\bin\Release\net8.0\publish\FinanceManager.deps.json
+D:\Coding\webapp\FinanceManager\bin\Release\net8.0\publish\FinanceManager.runtimeconfig.json
+D:\Coding\webapp\FinanceManager\bin\Release\net8.0\publish\FinanceManager.pdb
