@@ -27,4 +27,4 @@ Follow the instructions below to set up and run the application on your local ma
    dotnet run
 3. **Open in browser**
 
-   [localhost]((http://localhost:5227/))
+   [localhost](http://localhost:5227/)
