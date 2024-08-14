@@ -1,4 +1,4 @@
-# Simple Finance App
+# Simple Finance WebApp
 
 A simple finance management application that allows users to add and track their expenses.
 
