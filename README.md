@@ -26,5 +26,5 @@ Follow the instructions below to set up and run the application on your local ma
    ```bash
    dotnet run
 3. **Open in browser**
-   ```bash
+
    [http://localhost:5227/](url)
