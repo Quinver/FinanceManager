@@ -19345,11 +19345,6 @@
       "FileKind": "mvc"
     },
     {
-      "FilePath": "D:\\Coding\\webapp\\FinanceManager\\Views\\Finance\\Privacy.cshtml",
-      "TargetPath": "Views\\Finance\\Privacy.cshtml",
-      "FileKind": "mvc"
-    },
-    {
       "FilePath": "D:\\Coding\\webapp\\FinanceManager\\Views\\_ViewStart.cshtml",
       "TargetPath": "Views\\_ViewStart.cshtml",
       "FileKind": "mvc"

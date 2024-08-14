@@ -6,7 +6,7 @@ namespace FinanceManager.Controllers;
 
 public class FinanceController : Controller
 {
-    private static List<Expense> expenses = new();
+    private static List<Expense> expenses = new(); // List for all the expenses
 
     private readonly ILogger<FinanceController> _logger;
 
@@ -15,15 +15,11 @@ public class FinanceController : Controller
         _logger = logger;
     }
     
+    // On loading Index page
     public IActionResult Index()
     {
         expenses = expenses.OrderBy(e => e.DateTime).Reverse().ToList();
         return View(expenses);
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -32,6 +28,7 @@ public class FinanceController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
+    // View adding page
     [HttpGet]
     public IActionResult AddExpense()
     {
@@ -78,6 +75,7 @@ public class FinanceController : Controller
             var existingExpense = expenses.FirstOrDefault(e => e.Id == expense.Id);
             if (existingExpense != null)
             {
+
                 existingExpense.Name = expense.Name;
                 existingExpense.Amount = expense.Amount;
                 existingExpense.Description = expense.Description;
