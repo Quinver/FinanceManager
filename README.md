@@ -20,7 +20,7 @@ Follow the instructions below to set up and run the application on your local ma
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
+   git clone https://github.com/Quinver/FinanceManager.git
    cd your-repo-name
 2. **Run in terminal**:
    ```bash
