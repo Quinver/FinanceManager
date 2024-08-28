@@ -1,23 +1,30 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using FinanceManager.Models;
+using FinanceManager.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManager.Controllers;
 
 public class FinanceController : Controller
 {
-    private static List<Expense> expenses = new(); // List for all the expenses
-
     private readonly ILogger<FinanceController> _logger;
+    private readonly ApplicationDbContext _context;
 
-    public FinanceController(ILogger<FinanceController> logger)
+    public FinanceController(ILogger<FinanceController> logger, ApplicationDbContext context)
     {
         _logger = logger;
+        _context = context;
     }
-    
+
     // On loading Index page
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        var expenses = await _context.Expenses.ToListAsync();
+        foreach (var expense in expenses)
+        {
+            _logger.LogInformation("Retrieved expense ID: {Id}, Date: {DateTime}", expense.Id, expense.DateTime);
+        }
         expenses = expenses.OrderBy(e => e.DateTime).Reverse().ToList();
         return View(expenses);
     }
@@ -36,31 +43,38 @@ public class FinanceController : Controller
     }
 
     [HttpPost]
-    public IActionResult AddExpense(Expense expense)
+    [ValidateAntiForgeryToken]
+    [ActionName("AddExpense")]
+    public async Task<IActionResult> AddExpenseAsync(Expense expense)
     {
         if (ModelState.IsValid)
         {
-            expense.Id = expenses.Count + 1;
-            expenses.Add(expense);
-            return RedirectToAction("Index");
+            CheckDate(expense);
+
+            _context.Expenses.Add(expense);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
         return View(expense);
     }
 
     [HttpPost]
-    public IActionResult RemoveExpense(int Id)
+    [ActionName("RemoveExpense")]
+    public async Task<IActionResult> RemoveExpenseAsync(int Id)
     {
-        var expense = expenses.FirstOrDefault(e => e.Id == Id);
+        var expense = await _context.Expenses.FindAsync(Id);
         if (expense != null)
         {
-            expenses.Remove(expense);
+            _context.Expenses.Remove(expense);
+            await _context.SaveChangesAsync();
         }
         return RedirectToAction("Index");
     }
     [HttpGet]
-    public IActionResult EditExpense(int id)
+    [ActionName("EditExpense")]
+    public async Task<IActionResult> EditExpenseAsync(int id)
     {
-        var expense = expenses.FirstOrDefault(e => e.Id == id);
+        var expense = await _context.Expenses.FindAsync(id);
         if (expense == null)
             return NotFound();
 
@@ -68,11 +82,16 @@ public class FinanceController : Controller
     }
 
     [HttpPost]
-    public IActionResult EditExpense(Expense expense)
+    [ActionName("EditExpense")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditExpenseAsync(Expense expense)
     {
         if (ModelState.IsValid)
         {
-            var existingExpense = expenses.FirstOrDefault(e => e.Id == expense.Id);
+            CheckDate(expense);
+
+            var existingExpense = await _context.Expenses.FindAsync(expense.Id);
+
             if (existingExpense != null)
             {
 
@@ -80,57 +99,57 @@ public class FinanceController : Controller
                 existingExpense.Amount = expense.Amount;
                 existingExpense.Description = expense.Description;
                 existingExpense.DateTime = expense.DateTime;
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
+            return NotFound();
         }
         return View(expense);
     }
 
     [HttpPost]
-    public IActionResult ResetExpenses()
+    [ActionName("ResetExpenses")]
+    public async Task<IActionResult> ResetExpensesAsync()
     {
-        if (expenses.Count != 0)
-        {
-            expenses.Clear();
-        }
+        await _context.ClearDatabaseAsync();
+
         return RedirectToAction("Index");
     }
 
     [HttpPost]
-    public IActionResult DuplicateExpense(int Id)
+    [ActionName("DuplicateExpense")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DuplicateExpenseAsync(int Id)
     {
-        var expense = expenses.FirstOrDefault(e => e.Id == Id);
-        if (expense != null)
+        var existingExpense = await _context.Expenses.FindAsync(Id);
+        if (existingExpense != null)
         {
             var newExpense = new Expense
             {
-                Id = expenses.Count + 1,
-                Name = expense.Name,
-                Amount = expense.Amount,
-                Description = expense.Description,
-                DateTime = expense.DateTime
+                Name = existingExpense.Name,
+                Amount = existingExpense.Amount,
+                Description = existingExpense.Description,
+                DateTime = existingExpense.DateTime
             };
 
-            expenses.Add(newExpense);
+            _context.Expenses.Add(newExpense);
+            await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
         return RedirectToAction("Index");
     }
 
-    public IActionResult ExpenseChartDate()
+    private static void CheckDate(Expense expense)
     {
-        // Group expenses by date and sum them up
-        var expenseData = expenses
-            .GroupBy(e => e.DateTime.Date)
-            .Select(g => new
-            {
-                Date = g.Key.ToString("yyyy-MM-dd"), // Format the date
-                TotalAmount = g.Sum(e => e.Amount) // Sum the amounts
-            })
-            .OrderBy(d => d.Date)
-            .ToList();
-
-        return Json(expenseData); // Return data as JSON
+        if (expense.DateTime.Kind == DateTimeKind.Unspecified)
+        {
+            expense.DateTime = TimeZoneInfo.ConvertTimeToUtc(expense.DateTime);
+        }
+        else if (expense.DateTime.Kind == DateTimeKind.Local)
+        {
+            expense.DateTime = TimeZoneInfo.ConvertTimeToUtc(expense.DateTime);
+        }
     }
 }

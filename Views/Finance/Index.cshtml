@@ -32,7 +32,7 @@
         @for (int i = 0; i < Model.Count(); i++)
         {
             <tr class="expense-item @(i >= ShowCount ? "hidden" : "")">
-                <td>@Model.ElementAt(i).DateTime.ToShortDateString()</td>
+                <td>@Model.ElementAt(i).DateTime.AddDays(1).ToShortDateString()</td>
                 <td>@Model.ElementAt(i).Name</td>
                 <td>@Model.ElementAt(i).Description</td>
                 <td>€@Model.ElementAt(i).Amount</td>
@@ -69,12 +69,6 @@
     <button id="expandBtn" class="btn btn-info">Show More</button>
 }
 
-<div>
-    <canvas id="expensesChart" width="400" height="200"></canvas>
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var expandButton = document.getElementById('expandBtn');
@@ -96,59 +90,5 @@
                 }
             });
         }
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('@Url.Action("ExpenseChartDate")')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.length === 0) {
-                    console.log('No data available for the chart.');
-                    return;
-                }
-
-                // Adjust to match the JSON property names
-                const labels = data.map(item => item.date);  // Use 'date' from JSON
-                const totals = data.map(item => item.totalAmount);  // Use 'totalAmount' from JSON
-
-                const ctx = document.getElementById('expensesChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Total Expenses',
-                            data: totals,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Date'
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Amount (€)'
-                                }
-                            }
-                        }
-                    }
-                });
-            })
-            .catch(error => console.error('Error fetching chart data:', error));
     });
 </script>
